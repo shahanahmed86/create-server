@@ -67,7 +67,7 @@ new Promise((resolve) => {
 			`);
 			break;
 		}
-		case 'postgres': {
+		case 'postgresql': {
 			break;
 		}
 		default: {
@@ -79,11 +79,10 @@ new Promise((resolve) => {
 	}
 
 	resolve();
-})
-	.then(() => {
-		executeCommand('echo "\\e[1;32m ....running db migration to upsert tables.... \\e[0m"');
-		executeCommand('npm run db:deploy');
+}).then(() => {
+	executeCommand('echo "\\e[1;32m ....running db migration to upsert tables.... \\e[0m"');
+	executeCommand('npm run db:deploy');
 
-		executeCommand('echo "\\e[1;32m ....running test.... \\e[0m"');
-		executeCommand('mocha -r esm src/tests/**/*.spec.js --exit', true);
-	});
+	executeCommand('echo "\\e[1;32m ....running test.... \\e[0m"');
+	executeCommand('mocha -r esm src/tests/**/*.spec.js --exit', true);
+});

@@ -16,7 +16,7 @@ describe('Admin logout controller', function () {
 			});
 
 			const user = await middleware.ensureSignIn({ shouldAdmin: true }, `Bearer ${token}`);
-			const ctx = { req: { user }};
+			const ctx = { req: { user } };
 
 			const result = await adminController.logout(undefined, undefined, ctx);
 

@@ -23,7 +23,7 @@
 		"prettify": "prettier --no-editorconfig -l --write '**/*.{js,json}'",
 		"pretest": "npm run down",
 		"test": "node -r esm test-script.js",
-		"posttest": "npm run down:test; npm run up"
+		"posttest": "npm run down:test"
 	},
 	"lint-staged": {
 		"**/*.{js,json}": [

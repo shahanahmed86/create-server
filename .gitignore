@@ -115,3 +115,4 @@ migrations
 # exclude template
 template/source/docker*.yml
 template/source/prisma/migrations
+template/source/package-lock.json

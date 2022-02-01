@@ -1,3 +1,4 @@
+import path from 'path';
 import arg from 'arg';
 import inquirer from 'inquirer';
 import { createProject } from './main';
@@ -89,9 +90,29 @@ export async function cli(args) {
 	let options = parseArgumentsIntoOptions(args);
 	options = await promptForMissingOptions(options);
 
-	await createProject(options);
+	options.targetDirectory = options.targetDirectory || process.cwd();
+
+	const currentFileUrl = import.meta.url;
+
+	const templateDir = path.resolve(new URL(currentFileUrl).pathname, '../../template/source');
+	options.templateDirectory = templateDir;
 
 	const { templateDirectory, targetDirectory, dockerize, git, install, database } = options;
+
+	const isTargetDirNotEmpty =
+		executeCommand(
+			`[ "$(ls -A ${targetDirectory})" ] && echo true || echo false`,
+			false,
+			'pipe'
+		) === 'true';
+
+	if (isTargetDirNotEmpty) {
+		executeCommand(`echo "\n\\e[1;32m ...target folder is not empty... \\e[0m"`);
+
+		process.exit(1);
+	}
+
+	await createProject(options, templateDir);
 
 	let cmd = `cd ${targetDirectory}; node setup ${database} --yes`;
 

@@ -73,7 +73,7 @@ describe('Admin Authentication routes APIs', function () {
 			const { body: loginBody } = await adminAuth.login();
 
 			const { body: meBody, error: meError } = await adminAuth.me(loginBody.token);
-			
+
 			expect(meError).to.be.false;
 			adminId = meBody.id;
 
@@ -101,7 +101,7 @@ describe('Admin Authentication routes APIs', function () {
 			const { body: loginBody } = await adminAuth.login('shahan', 'shahan1');
 
 			const { body: meBody, error: meError } = await adminAuth.me(loginBody.token);
-			
+
 			expect(meError).to.be.false;
 			adminId = meBody.id;
 

@@ -7,11 +7,19 @@
 git clone https://github.com/shahanahmed86/graphql-rest-server.git && cd graphql-rest-server
 
 # dockerize the project
-node setup docker
+node setup
+
+# supported databases (mysql, postgresql) can be provided as an argument, like:
+node setup mysql
+# or
+node setup postgresql
+# if you've dockerize it and selected postgresql option then you have to change docker-compose.yml file accordingly.
 
 # flags
--f # for reinstalling the node_modules again like "node setup -f" or "node setup docker -f"
-docker to setup with docker
+--yes # to skip question and go with default options
+--force-reinstall # to reinstall node_modules
+--git # to initialize git subject to non initialized
+--dockerize # off-course
 
 # run the server
 npm run dev
@@ -21,10 +29,10 @@ npm run dev
 
 ```sh
 # docker to open bash
-docker exec -it graphql-rest-server_db_1 bash
+docker exec -it <container_name> bash
 
 # docker to open mysql
-docker exec -it graphql-rest-server_db_1 mysql -u root -p prisma
+docker exec -it <container_name> mysql -u root -p prisma
 
 # flags
 -it # for interactive
@@ -36,9 +44,11 @@ docker exec -it graphql-rest-server_db_1 mysql -u root -p prisma
 
 ```sh
 # docker to open bash
-docker exec -it graphql-rest-server_db_1 bash
-# docker to open plsql
-docker exec -it graphql-rest-server_db_1 psql -U prisma -W dev
+docker exec -it <container_name> bash
+
+# docker to open psql
+docker exec -it <container_name> psql -U prisma -W dev
+
 # flags
 -it # for interactive
 -U # for username
@@ -49,14 +59,14 @@ docker exec -it graphql-rest-server_db_1 psql -U prisma -W dev
 ## redis commands
 
 ```sh
-docker exec -it graphql-rest-server_cache_1 redis-cli -a secret
+docker exec -it <container_name> redis-cli -a secret
 # flags
 -it # for interactive
 redis-cli # to load redis command line interface
 -a # cli password
 # redis commands
 scan 0
-get "adminToken"
-ttl "adminToken"
-del "adminToken"
+get "unique_identifier"
+ttl "unique_identifier"
+del "unique_identifier"
 ```

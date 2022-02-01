@@ -8,7 +8,7 @@ const { expect } = chai;
 describe('User signup controller', function () {
 	this.timeout(0);
 	this.slow(1000);
-	
+
 	it('user signup => should success', async () => {
 		let userId;
 		try {
