@@ -1,0 +1,95 @@
+{
+	"name": "graphql-rest-server",
+	"description": "Boiler plate for nodejs application with graphql & express",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"postinstall": "echo 'installing husky....' && husky install",
+		"dev": "cross-env NODE_ENV=development nodemon -r esm .",
+		"start": "cross-env NODE_ENV=production node -r esm .",
+		"up:test": "docker-compose -f docker-compose.test.yml up -d",
+		"down:test": "docker-compose -f docker-compose.test.yml down -v",
+		"up": "docker-compose up -d",
+		"down": "docker-compose down",
+		"down:hard": "docker-compose down -v",
+		"deep-check": "depcheck --ignores esm,ejs,eslint-plugin-prettier",
+		"db:format": "prisma format",
+		"predb:deploy": "npm run db:format",
+		"db:deploy": "prisma migrate dev --name init",
+		"postdb:deploy": "npm run db:seed",
+		"db:seed": "prisma db seed",
+		"db:reset": "prisma migrate reset",
+		"lint": "eslint '**/*.js'",
+		"prettify": "prettier --no-editorconfig -l --write '**/*.{js,json}'",
+		"pretest": "npm run down",
+		"test": "node -r esm test-script.js",
+		"posttest": "npm run down:test; npm run up"
+	},
+	"lint-staged": {
+		"**/*.{js,json}": [
+			"npm run lint",
+			"npm run prettify",
+			"npm run test"
+		]
+	},
+	"prisma": {
+		"seed": "node -r esm prisma/seed.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/shahanahmed86/graphql-rest-server.git"
+	},
+	"keywords": [
+		"boiler-plate",
+		"nodejs",
+		"apollo server express",
+		"apollo server"
+	],
+	"author": "Shahan",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/shahanahmed86/graphql-rest-server/issues"
+	},
+	"homepage": "https://github.com/shahanahmed86/graphql-rest-server#readme",
+	"dependencies": {
+		"@graphql-tools/schema": "^8.3.1",
+		"@graphql-tools/utils": "^8.5.5",
+		"@prisma/client": "^3.6.0",
+		"apollo-server-core": "^3.5.0",
+		"apollo-server-express": "^3.5.0",
+		"arg": "^5.0.1",
+		"bcryptjs": "^2.4.3",
+		"cors": "^2.8.5",
+		"ejs": "^3.1.6",
+		"express": "^4.17.1",
+		"express-fileupload": "^1.2.1",
+		"graphql": "^15.8.0",
+		"inquirer": "^8.2.0",
+		"ioredis": "^4.28.2",
+		"joi": "^17.5.0",
+		"jsonwebtoken": "^8.5.1",
+		"moment": "^2.29.1",
+		"morgan": "^1.10.0"
+	},
+	"devDependencies": {
+		"chai": "^4.3.4",
+		"chai-http": "^4.3.0",
+		"cross-env": "^7.0.3",
+		"depcheck": "^1.4.2",
+		"dotenv": "^10.0.0",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-config-standard": "^16.0.3",
+		"eslint-plugin-import": "^2.25.3",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"eslint-plugin-promise": "^5.2.0",
+		"esm": "^3.2.25",
+		"husky": "^7.0.4",
+		"lint-staged": "^12.1.2",
+		"mocha": "^8.4.0",
+		"nodemon": "^2.0.15",
+		"prettier": "^2.5.1",
+		"prisma": "^3.6.0"
+	}
+}

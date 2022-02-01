@@ -1,0 +1,18 @@
+{
+	"env": {
+		"commonjs": true,
+		"browser": true,
+		"es2021": true,
+		"node": true,
+		"mocha": true
+	},
+	"extends": ["standard", "prettier"],
+	"ignorePatterns": ["package*.json", "_builds"],
+	"rules": {},
+	"overrides": [
+		{
+			"files": ["*.spec.js"],
+			"rules": { "no-unused-expressions": "off" }
+		}
+	]
+}

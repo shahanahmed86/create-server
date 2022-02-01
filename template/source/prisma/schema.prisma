@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String    @id @default(uuid())
+  username  String
+  password  String
+  role      AdminRole @default(MANAGER)
+  isDeleted Boolean   @default(false)
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+enum AdminRole {
+  SYSTEM
+  MANAGER
+}
+
+model User {
+  id         String     @id @default(uuid())
+  username   String?
+  password   String?
+  avatar     String?
+  fullName   String?
+  email      String?
+  cell       String?
+  gender     Gender?
+  signUpType SignUpType @default(LOCAL)
+  isDeleted  Boolean    @default(false)
+  createdAt  DateTime
+  updatedAt  DateTime
+}
+
+enum SignUpType {
+  LOCAL
+  FACEBOOK
+  GOOGLE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  PREFER_NOT_TO_SAY
+}

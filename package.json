@@ -1,0 +1,28 @@
+{
+	"name": "@shahanahmed86/create-server",
+	"version": "1.0.0",
+	"description": "A CLI to bootstrap a server",
+	"main": "src/index.js",
+	"bin": {
+		"@shahanahmed86/create-server": "bin/create-server",
+		"create-server": "bin/create-server"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"cli",
+		"create-server"
+	],
+	"author": "Shahan",
+	"license": "MIT",
+	"dependencies": {
+		"arg": "^5.0.1",
+		"esm": "^3.2.25",
+		"inquirer": "^8.2.0",
+		"ncp": "^2.0.0"
+	}
+}
