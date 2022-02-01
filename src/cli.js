@@ -133,4 +133,6 @@ export async function cli(args) {
 	if (git) cmd += ' --git';
 
 	if (install) executeCommand(cmd);
+
+	executeCommand(`cd ${targetDirectory}; mv gitignore .gitignore`);
 }
