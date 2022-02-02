@@ -1,6 +1,6 @@
 {
 	"name": "@shahanahmed86/create-server",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "A CLI to bootstrap a server",
 	"main": "src/index.js",
 	"bin": {
@@ -13,12 +13,24 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/shahanahmed86/create-server.git"
+	},
 	"keywords": [
 		"cli",
-		"create-server"
+		"create-server",
+		"boiler-plate",
+		"nodejs",
+		"apollo server express",
+		"apollo server"
 	],
 	"author": "Shahan",
 	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/shahanahmed86/create-server/issues"
+	},
+	"homepage": "https://github.com/shahanahmed86/create-server#readme",
 	"dependencies": {
 		"arg": "^5.0.1",
 		"esm": "^3.2.25",
