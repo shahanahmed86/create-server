@@ -5,26 +5,24 @@ import { ensureSignedIn, ensureSignedOut } from '../../../middleware';
 
 const router = express.Router();
 
-router.get('/me', ensureSignedIn({ shouldAdmin: false, shouldUser: true }), (...args) =>
+router.get('/me', ensureSignedIn({ shouldUser: true }), (...args) =>
 	catchAsync(restWrapper(args, userController.me)),
 );
 
-router.post('/login', ensureSignedOut({ shouldAdmin: false, shouldUser: true }), (...args) =>
+router.post('/login', ensureSignedOut({ shouldUser: true }), (...args) =>
 	catchAsync(restWrapper(args, userController.login)),
 );
 
-router.delete('/logout', ensureSignedIn({ shouldAdmin: false, shouldUser: true }), (...args) =>
+router.delete('/logout', ensureSignedIn({ shouldUser: true }), (...args) =>
 	catchAsync(restWrapper(args, userController.logout)),
 );
 
-router.post('/signup', ensureSignedOut({ shouldAdmin: false, shouldUser: true }), (...args) =>
+router.post('/signup', ensureSignedOut({ shouldUser: true }), (...args) =>
 	catchAsync(restWrapper(args, userController.signup)),
 );
 
-router.put(
-	'/change-password',
-	ensureSignedIn({ shouldAdmin: false, shouldUser: true }),
-	(...args) => catchAsync(restWrapper(args, userController.changePassword)),
+router.put('/change-password', ensureSignedIn({ shouldUser: true }), (...args) =>
+	catchAsync(restWrapper(args, userController.changePassword)),
 );
 
 export default router;

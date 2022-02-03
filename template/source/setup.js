@@ -154,7 +154,7 @@ let options = {
 			const existingProvider = getJSON('prisma/schema.prisma').provider;
 
 			if (existingProvider && !existingProvider.includes(db)) {
-				executeCommand(`sed -i -e 's/= ${existingProvider}/= "${db}"/g' prisma/schema.prisma`);
+				executeCommand(`sed -i -e 's,= ${existingProvider},= "${db}",g' prisma/schema.prisma`);
 			}
 
 			executeCommand('npm run db:deploy');

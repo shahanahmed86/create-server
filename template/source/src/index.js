@@ -30,7 +30,6 @@ server.start().then(() => {
 
 	httpServer.listen({ port: APP_PORT }, () => {
 		console.log(`🚀 REST-APIs    : ${BASE_URL}/api`);
-
 		console.log(`🚀 GRAPHQL-APIs : ${BASE_URL}${server.graphqlPath}`);
 	});
 });

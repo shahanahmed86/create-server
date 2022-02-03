@@ -7,7 +7,6 @@ import { copyFiles, executeCommand } from './helper';
 function parseArgumentsIntoOptions(rawArgs) {
 	const args = arg(
 		{
-			'--yes': Boolean,
 			'--git': Boolean,
 			'--install': Boolean,
 			'--dockerize': Boolean,
@@ -21,7 +20,6 @@ function parseArgumentsIntoOptions(rawArgs) {
 		}
 	);
 	return {
-		skipPrompts: args['--yes'] || false,
 		git: args['--git'] || false,
 		install: args['--install'] || false,
 		dockerize: args['--dockerize'] || false,
@@ -30,22 +28,25 @@ function parseArgumentsIntoOptions(rawArgs) {
 }
 
 async function promptForMissingOptions(options) {
-	const defaultDatabase = 'mysql';
-	if (options.skipPrompts) {
-		return {
-			...options,
-			database: options.database || defaultDatabase
-		};
-	}
-
-	const questions = [];
+	const questions = [
+		{
+			type: 'input',
+			name: 'project',
+			message: 'Please enter the name of the project: '
+		},
+		{
+			type: 'input',
+			name: 'repository',
+			message: "Please enter the Repository's URL: "
+		}
+	];
 	if (!options.database) {
 		questions.push({
 			type: 'list',
 			name: 'database',
 			message: 'Please choose which database to use',
 			choices: ['mysql', 'postgresql'],
-			default: defaultDatabase
+			default: 'mysql'
 		});
 	}
 
@@ -54,7 +55,7 @@ async function promptForMissingOptions(options) {
 			type: 'confirm',
 			name: 'git',
 			message: 'Initialize a git repository?',
-			default: false
+			default: true
 		});
 	}
 
@@ -63,7 +64,7 @@ async function promptForMissingOptions(options) {
 			type: 'confirm',
 			name: 'install',
 			message: 'Do you wanna install it?',
-			default: false
+			default: true
 		});
 	}
 
@@ -72,17 +73,37 @@ async function promptForMissingOptions(options) {
 			type: 'confirm',
 			name: 'dockerize',
 			message: 'Do you wanna dockerize it?',
-			default: false
+			default: true
 		});
 	}
 
 	const answers = await inquirer.prompt(questions);
+
+	let errorMessages = [];
+	if (!answers.project) errorMessages.push('project name is mandatory');
+
+	if (!answers.repository) errorMessages.push(`repository URL is mandatory`);
+
+	const regex = /((git|ssh|http(s)?)|(git@[\w.]+))(:(\/\/)?)([\w.@:/\-~]+)(\.git)(\/)?/;
+	if (answers.repository && regex.test(answers.repository)) {
+		errorMessages.push(
+			`repository URL should be a git repo link i.e.: https://github.com/username/repo.git`
+		);
+	}
+
+	if (errorMessages.length) {
+		executeCommand(`echo "\n\\e[1;31m ...${errorMessages.join(', ')}... \\e[0m"`);
+
+		process.exit(1);
+	}
 	return {
 		...options,
 		database: options.database || answers.database,
 		git: options.git || answers.git,
 		install: options.install || answers.install,
-		dockerize: options.dockerize || answers.dockerize
+		dockerize: options.dockerize || answers.dockerize,
+		project: answers.project,
+		repository: answers.repository
 	};
 }
 
@@ -90,14 +111,11 @@ export async function cli(args) {
 	let options = parseArgumentsIntoOptions(args);
 	options = await promptForMissingOptions(options);
 
-	options.targetDirectory = options.targetDirectory || process.cwd();
+	const targetDirectory = process.cwd();
+	const currentFileUrl = new URL(import.meta.url).pathname;
+	const templateDirectory = path.resolve(currentFileUrl, '../../template/source');
 
-	const currentFileUrl = import.meta.url;
-
-	const templateDir = path.resolve(new URL(currentFileUrl).pathname, '../../template/source');
-	options.templateDirectory = templateDir;
-
-	const { templateDirectory, targetDirectory, dockerize, git, install, database } = options;
+	const { dockerize, git, install, database, repository, project } = options;
 
 	const isTargetDirNotEmpty =
 		executeCommand(
@@ -107,14 +125,27 @@ export async function cli(args) {
 		) === 'true';
 
 	if (isTargetDirNotEmpty) {
-		executeCommand(`echo "\n\\e[1;32m ...target folder is not empty... \\e[0m"`);
+		executeCommand(`echo "\n\\e[1;31m ...target folder is not empty... \\e[0m"`);
 
 		process.exit(1);
 	}
 
-	await createProject(options, templateDir);
+	await createProject(templateDirectory, targetDirectory);
 
-	let cmd = `cd ${targetDirectory}; node setup ${database} --yes`;
+	// changing name of gitignore file by prefix "."
+	let cmd = `cd ${targetDirectory}; mv gitignore .gitignore;`;
+
+	// applying provided project name to package.json
+	const currentProject = '<project_name>';
+	cmd += `sed -i -e 's,${currentProject},${project},g' package.json;`;
+
+	// applying provided repository name to package.json
+	const currentRepo = '<repository_name>';
+	cmd += `sed -i -e 's,${currentRepo},${repository},g' package.json`;
+
+	executeCommand(cmd);
+
+	cmd = `cd ${targetDirectory}; node setup ${database} --yes`;
 
 	if (dockerize) {
 		cmd += ' --dockerize';
@@ -133,6 +164,4 @@ export async function cli(args) {
 	if (git) cmd += ' --git';
 
 	if (install) executeCommand(cmd);
-
-	executeCommand(`cd ${targetDirectory}; mv gitignore .gitignore`);
 }
