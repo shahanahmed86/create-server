@@ -2,7 +2,13 @@ import path from 'path';
 import arg from 'arg';
 import inquirer from 'inquirer';
 import { createProject } from './main';
-import { copyFiles, executeCommand } from './helper';
+import {
+	copyFiles,
+	databaseValidator,
+	executeCommand,
+	projectValidator,
+	repositoryValidator
+} from './helper';
 
 function parseArgumentsIntoOptions(rawArgs) {
 	const args = arg(
@@ -79,20 +85,12 @@ async function promptForMissingOptions(options) {
 
 	const answers = await inquirer.prompt(questions);
 
-	let errorMessages = [];
-	if (!answers.project) errorMessages.push('project name is mandatory');
-
-	if (!answers.repository) errorMessages.push(`repository URL is mandatory`);
-
-	const regex = /((git|ssh|http(s)?)|(git@[\w.]+))(:(\/\/)?)([\w.@:/\-~]+)(\.git)(\/)?/;
-	if (answers.repository && regex.test(answers.repository)) {
-		errorMessages.push(
-			`repository URL should be a git repo link i.e.: https://github.com/username/repo.git`
-		);
-	}
-
-	if (errorMessages.length) {
-		executeCommand(`echo "\n\\e[1;31m ...${errorMessages.join(', ')}... \\e[0m"`);
+	try {
+		projectValidator(options.project || answers.project);
+		repositoryValidator(options.repository || answers.repository);
+		databaseValidator(options.database || answers.database);
+	} catch (error) {
+		executeCommand(`echo "\n\\e[1;31m ...${error.message}... \\e[0m"`);
 
 		process.exit(1);
 	}
@@ -136,11 +134,11 @@ export async function cli(args) {
 	let cmd = `cd ${targetDirectory}; mv gitignore .gitignore;`;
 
 	// applying provided project name to package.json
-	const currentProject = '<project_name>';
+	const currentProject = 'project_name';
 	cmd += `sed -i -e 's,${currentProject},${project},g' package.json;`;
 
 	// applying provided repository name to package.json
-	const currentRepo = '<repository_name>';
+	const currentRepo = 'repository_name';
 	cmd += `sed -i -e 's,${currentRepo},${repository},g' package.json`;
 
 	executeCommand(cmd);

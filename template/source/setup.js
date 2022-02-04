@@ -1,15 +1,9 @@
 const cp = require('child_process');
-
-const isNpmInstalled =
-	executeCommand('[ -d node_modules ] && echo true || echo false', false, 'pipe') === 'true';
-
-if (!isNpmInstalled) {
-	coloredLogs('Copying files...');
-
-	executeCommand('npm install', undefined, 'ignore');
-}
-
 const fs = require('fs');
+
+const isFirst = !fs.existsSync('node_modules');
+shouldInstallModules();
+
 const inquirer = require('inquirer');
 const arg = require('arg');
 
@@ -20,8 +14,8 @@ const rawArgs = arg(
 		'--git': Boolean,
 		'--dockerize': Boolean,
 		'-y': '--yes',
-		'-g': '--git',
 		'-f': '--force-reinstall',
+		'-g': '--git',
 		'-d': '--dockerize',
 	},
 	{
@@ -41,9 +35,12 @@ let options = {
 	try {
 		options = await promptForMissingOptions(options);
 
-		if (options.forceReInstall) fs.rmSync('./node_modules', { recursive: true });
+		if (!isFirst && options.forceReInstall) {
+			fs.rmSync('node_modules', { recursive: true });
+			fs.rmSync('.husky/_', { recursive: true });
+		}
 
-		if (!fs.existsSync('node_modules')) executeCommand('npm install', undefined, 'ignore');
+		shouldInstallModules();
 
 		let port = 3306;
 		if (options.database === 'postgresql') port = 5432;
@@ -244,4 +241,12 @@ function getJSON(filePath, separate = ' = ') {
 			if (key.trim()) acc = { ...acc, [key]: value };
 			return acc;
 		}, {});
+}
+
+function shouldInstallModules() {
+	if (!fs.existsSync('node_modules')) {
+		coloredLogs('Copying files...');
+
+		executeCommand('npm install');
+	}
 }

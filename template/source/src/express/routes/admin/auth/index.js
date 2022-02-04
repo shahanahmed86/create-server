@@ -15,41 +15,23 @@ const router = express.Router();
  *         id:
  *           type: string
  *           description: The auto-generated id
+ *           example: 8f06be04-9299-42cd-887b-bcfcab2e156e
  *         username:
  *           type: string
- *           description: username
+ *           description: username of the admin
+ *           example: admin
  *         role:
  *           type: string
- *           description: role
+ *           description: role of the admin
+ *           example: System
  *         createdAt:
  *           type: string
- *           description: The created date & time of role
+ *           description: The created date & time of the admin
+ *           example: 2022-01-29T21:30:00.0000Z
  *         updatedAt:
  *           type: string
- *           description: The updated date & time of role
- *       example:
- *           id: 8f06be04-9299-42cd-887b-bcfcab2e156e
- *           username: admin
- *           role: System
- *           createdAt: 2022-01-29T21:30:00.0000Z
- *           updatedAt: 2022-01-31T12:00:00.0000Z
- */
-
-/**
- * @openapi
- * components:
- *   schemas:
- *     AuthAdmin:
- *       type: object
- *       properties:
- *         token:
- *           type: string
- *           description: JWT token to include in headers
- *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..........9TaqCIfHvkFAtA5vLbvvmcR8Z8ttq_Wxs4vMCsfvoZw
- *         admin:
- *           allOf:
- *             - type: object
- *             - $ref: '#/components/schemas/Admin'
+ *           description: The updated date & time of the admin
+ *           example: 2022-01-31T12:00:00.0000Z
  */
 
 /**
@@ -76,8 +58,6 @@ router.get('/me', ensureSignedIn({ shouldAdmin: true }), (...args) =>
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Admin'
- *       401:
- *         description: Unauthorized
  */
 
 router.post('/login', ensureSignedOut({ shouldAdmin: true }), (...args) =>
@@ -86,43 +66,41 @@ router.post('/login', ensureSignedOut({ shouldAdmin: true }), (...args) =>
 
 /**
  * @openapi
- * components:
- *   schemas:
- *     LoginAdmin:
- *       type: object
- *       properties:
- *         username:
- *           type: string
- *           description: username
- *         password:
- *           type: string
- *           description: password
- *       example:
- *           username: shahan
- *           password: shahan
- */
-
-/**
- * @openapi
  * /api/admin/auth/login:
  *   post:
- *     summary: Returns token and user's payload
+ *     summary: Returns token and admin's payload
  *     tags: [Admin_Authentications]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LoginAdmin'
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: username
+ *                 example: shahan
+ *               password:
+ *                 type: string
+ *                 description: password
+ *                 example: shahan
  *     responses:
  *       200:
  *         description: Login
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AuthAdmin'
- *       401:
- *         description: Unauthorized
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token to include in headers
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..........9TaqCIfHvkFAtA5vLbvvmcR8Z8ttq_Wxs4vMCsfvoZw
+ *                 admin:
+ *                   allOf:
+ *                     - type: object
+ *                     - $ref: '#/components/schemas/Admin'
  */
 
 router.delete('/logout', ensureSignedIn({ shouldAdmin: true }), (...args) =>
@@ -143,31 +121,11 @@ router.delete('/logout', ensureSignedIn({ shouldAdmin: true }), (...args) =>
  *             schema:
  *               type: string
  *               example: You've successfully signed out.
- *       409:
- *         description: Conflict
  */
 
 router.put('/change-password', ensureSignedIn({ shouldAdmin: true }), (...args) =>
 	catchAsync(restWrapper(args, adminController.changePassword)),
 );
-
-/**
- * @openapi
- * components:
- *   schemas:
- *     ChangePasswordAdmin:
- *       type: object
- *       properties:
- *         oldPassword:
- *           type: string
- *           description: old password
- *         password:
- *           type: string
- *           description: new password
- *       example:
- *           oldPassword: shahan
- *           password: 123abc456
- */
 
 /**
  * @openapi
@@ -180,7 +138,16 @@ router.put('/change-password', ensureSignedIn({ shouldAdmin: true }), (...args) 
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ChangePasswordAdmin'
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: old password
+ *                 example: shahan
+ *               password:
+ *                 type: string
+ *                 description: new password
+ *                 example: 123abc456
  *     responses:
  *       200:
  *         description: Change password
@@ -189,8 +156,6 @@ router.put('/change-password', ensureSignedIn({ shouldAdmin: true }), (...args) 
  *             schema:
  *               type: string
  *               example: Password changed successfully
- *       409:
- *         description: Conflict
  */
 
 export default router;

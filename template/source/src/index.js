@@ -1,5 +1,5 @@
 import {
-	ApolloServerPluginLandingPageGraphQLPlayground as enablePlayground,
+	ApolloServerPluginDrainHttpServer as enablePlayground,
 	ApolloServerPluginLandingPageDisabled as disablePlayground,
 } from 'apollo-server-core';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -9,19 +9,15 @@ import app from './express';
 import { typeDefs, resolvers, directives } from './graphql';
 import { BASE_URL, APP_PORT, IN_PROD } from './config';
 
-const httpServer = http.createServer(app);
-
 let schema = makeExecutableSchema({ typeDefs, resolvers });
 Object.entries(directives).forEach(([key, directive]) => (schema = directive(schema, key)));
+
+const httpServer = http.createServer(app);
 
 const server = new ApolloServer({
 	introspection: true,
 	schema,
-	plugins: [
-		IN_PROD
-			? disablePlayground()
-			: enablePlayground({ settings: { 'request.credentials': 'include' } }),
-	],
+	plugins: [IN_PROD ? disablePlayground() : enablePlayground({ httpServer })],
 	context: ({ req, res }) => ({ req, res }),
 });
 
