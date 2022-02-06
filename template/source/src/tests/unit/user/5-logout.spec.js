@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { logics } from '../../utils';
-import { userController, middleware } from '../../controllers';
+import { logics } from '../../../utils';
+import { userController, middleware } from '../../../controllers';
 
 const { expect } = chai;
 
@@ -11,7 +11,7 @@ describe('User logout controller', function () {
 	it('user logout => should success', async () => {
 		try {
 			const { token } = await userController.login(null, {
-				username: 'shahanahmed86',
+				username: 'test-user',
 				password: '123abc4567',
 			});
 

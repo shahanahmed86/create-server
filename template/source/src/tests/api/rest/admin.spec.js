@@ -1,15 +1,15 @@
 import chai from 'chai';
-import { BASE_URL } from '../../config';
-import { adminAuth } from '../helper';
-import { auth } from '../../utils';
+import { BASE_URL } from '../../../config';
+import { adminAuth } from '../../helper';
+import { auth } from '../../../utils';
 import chaiHttp from 'chai-http';
-import app from '../..';
+import app from '../../../';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('Admin Authentication routes APIs', function () {
+describe('RESTful - Admin Authentication APIs', function () {
 	this.timeout(0);
 	this.slow(1000);
 

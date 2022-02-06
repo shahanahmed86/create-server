@@ -13,10 +13,8 @@ import {
 function parseArgumentsIntoOptions(rawArgs) {
 	const args = arg(
 		{
-			'--git': Boolean,
 			'--install': Boolean,
 			'--dockerize': Boolean,
-			'-g': '--git',
 			'-y': '--yes',
 			'-i': '--install',
 			'-d': '--dockerize'
@@ -26,7 +24,6 @@ function parseArgumentsIntoOptions(rawArgs) {
 		}
 	);
 	return {
-		git: args['--git'] || false,
 		install: args['--install'] || false,
 		dockerize: args['--dockerize'] || false,
 		database: args._[0]
@@ -53,15 +50,6 @@ async function promptForMissingOptions(options) {
 			message: 'Please choose which database to use',
 			choices: ['mysql', 'postgresql'],
 			default: 'mysql'
-		});
-	}
-
-	if (!options.git) {
-		questions.push({
-			type: 'confirm',
-			name: 'git',
-			message: 'Initialize a git repository?',
-			default: true
 		});
 	}
 
@@ -97,7 +85,6 @@ async function promptForMissingOptions(options) {
 	return {
 		...options,
 		database: options.database || answers.database,
-		git: options.git || answers.git,
 		install: options.install || answers.install,
 		dockerize: options.dockerize || answers.dockerize,
 		project: answers.project,
@@ -113,7 +100,7 @@ export async function cli(args) {
 	const currentFileUrl = new URL(import.meta.url).pathname;
 	const templateDirectory = path.resolve(currentFileUrl, '../../template/source');
 
-	const { dockerize, git, install, database, repository, project } = options;
+	const { dockerize, install, database, repository, project } = options;
 
 	const isTargetDirNotEmpty =
 		executeCommand(
@@ -132,6 +119,7 @@ export async function cli(args) {
 
 	// changing name of gitignore file by prefix "."
 	let cmd = `cd ${targetDirectory}; mv gitignore .gitignore;`;
+	cmd += `mv .husky/gitignore .husky/.gitignore;`;
 
 	// applying provided project name to package.json
 	const currentProject = 'project_name';
@@ -158,8 +146,6 @@ export async function cli(args) {
 			`${targetDirectory}/docker-compose.test.yml`
 		);
 	}
-
-	if (git) cmd += ' --git';
 
 	if (install) executeCommand(cmd);
 }

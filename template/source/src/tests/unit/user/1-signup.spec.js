@@ -1,7 +1,7 @@
 import chai from 'chai';
-import { auth, logics } from '../../utils';
-import { userController } from '../../controllers';
-import { common, schemas } from '../helper';
+import { auth, logics } from '../../../utils';
+import { userController } from '../../../controllers';
+import { common, schemas } from '../../helper';
 
 const { expect } = chai;
 
@@ -16,7 +16,7 @@ describe('User signup controller', function () {
 			expect(error).to.be.false;
 
 			const { token, user } = await userController.signup(null, {
-				username: 'shahanahmed86',
+				username: 'test-user-2',
 				password: '123abc456',
 				avatar: body.path,
 				fullName: 'Shahan Ahmed Khan',
@@ -47,7 +47,7 @@ describe('User signup controller', function () {
 	it('user signup => should failed', async () => {
 		try {
 			await userController
-				.signup(null, { username: 'shahanahmed86', password: '123abc456' })
+				.signup(null, { username: 'test-user-2', password: '123abc456' })
 				.catch((error) => {
 					const { errorMessage } = logics.catchError(error);
 					expect(errorMessage).to.be.a.string('User already exists with this username');
@@ -63,13 +63,13 @@ describe('User signup controller', function () {
 				expect(errorMessage).to.be.a.string('Username cannot be an empty field');
 			});
 
-			await userController.signup(null, { username: 'shahanahmed86' }).catch((error) => {
+			await userController.signup(null, { username: 'test-user-2' }).catch((error) => {
 				const { errorMessage } = logics.catchError(error);
 				expect(errorMessage).to.be.a.string('Password is a required field');
 			});
 
 			await userController
-				.signup(null, { username: 'shahanahmed86', password: '' })
+				.signup(null, { username: 'test-user-2', password: '' })
 				.catch((error) => {
 					const { errorMessage } = logics.catchError(error);
 					expect(errorMessage).to.be.a.string('Password cannot be an empty field');

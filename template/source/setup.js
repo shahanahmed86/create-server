@@ -11,11 +11,9 @@ const rawArgs = arg(
 	{
 		'--yes': Boolean,
 		'--force-reinstall': Boolean,
-		'--git': Boolean,
 		'--dockerize': Boolean,
 		'-y': '--yes',
 		'-f': '--force-reinstall',
-		'-g': '--git',
 		'-d': '--dockerize',
 	},
 	{
@@ -26,7 +24,6 @@ const rawArgs = arg(
 let options = {
 	forceReInstall: rawArgs['--force-reinstall'] || false,
 	skipPrompts: rawArgs['--yes'] || false,
-	git: rawArgs['--git'] || false,
 	dockerize: rawArgs['--dockerize'] || false,
 	database: rawArgs._[0],
 };
@@ -62,8 +59,6 @@ let options = {
 
 			env = getJSON('.env', '=');
 		}
-
-		if (options.git) executeCommand(`git init`);
 
 		const [db, config] = env.DATABASE_URL.split('://');
 
@@ -156,6 +151,9 @@ let options = {
 
 			executeCommand('npm run db:deploy');
 
+			// initial commit
+			executeCommand('git add .; git commit -m "initial commit" --no-verify');
+
 			coloredLogs('Setup Finished', undefined, true);
 		});
 	} catch (error) {
@@ -214,19 +212,9 @@ async function promptForMissingOptions(options) {
 		});
 	}
 
-	if (!options.git && !fs.existsSync('.git')) {
-		questions.push({
-			type: 'confirm',
-			name: 'git',
-			message: 'Do you wanna git it?',
-			default: false,
-		});
-	}
-
 	const answers = await inquirer.prompt(questions);
 	return {
 		...options,
-		git: options.git || answers.git,
 		database: options.database || answers.database,
 		dockerize: options.dockerize || answers.dockerize,
 	};
@@ -244,6 +232,8 @@ function getJSON(filePath, separate = ' = ') {
 }
 
 function shouldInstallModules() {
+	if (!fs.existsSync('.git')) executeCommand(`git init`);
+
 	if (!fs.existsSync('node_modules')) {
 		coloredLogs('Copying files...');
 

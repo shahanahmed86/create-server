@@ -14,7 +14,6 @@ create-server postgresql
 # flags
 --yes # to skip question and go with default options
 --install # to setup the server
---git # to initialize git subject to non initialized
 --dockerize # off-course
 
 # run the server

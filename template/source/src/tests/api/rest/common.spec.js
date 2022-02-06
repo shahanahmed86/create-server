@@ -1,15 +1,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { BASE_URL } from '../../config';
-import { common } from '../helper';
-import app from '../..';
-import { executeCommand } from '../../utils';
+import { BASE_URL } from '../../../config';
+import { common } from '../../helper';
+import app from '../../../';
+import { executeCommand } from '../../../utils';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('Common routes APIs', function () {
+describe('RESTful - Common APIs', function () {
 	this.timeout(0);
 	this.slow(1000);
 

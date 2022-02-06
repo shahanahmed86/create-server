@@ -1,15 +1,15 @@
 import chai from 'chai';
-import { BASE_URL } from '../../config';
-import { userAuth, common } from '../helper';
-import { auth, executeCommand } from '../../utils';
+import { BASE_URL } from '../../../config';
+import { userAuth, common } from '../../helper';
+import { auth } from '../../../utils';
 import chaiHttp from 'chai-http';
-import app from '../..';
+import app from '../../../';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('User Authentication routes APIs', function () {
+describe('RESTful - User Authentication APIs', function () {
 	this.timeout(0);
 	this.slow(1000);
 
@@ -166,9 +166,5 @@ describe('User Authentication routes APIs', function () {
 		} finally {
 			if (userId) await auth.signOut(userId);
 		}
-	});
-
-	after(async () => {
-		executeCommand('rm uploads/*.*');
 	});
 });

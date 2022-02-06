@@ -1,7 +1,7 @@
 import chai from 'chai';
-import { auth, logics } from '../../utils';
-import { userController } from '../../controllers';
-import { schemas } from '../helper';
+import { auth, logics } from '../../../utils';
+import { userController } from '../../../controllers';
+import { schemas } from '../../helper';
 
 const { expect } = chai;
 
@@ -13,7 +13,7 @@ describe('User login controller', function () {
 		let userId;
 		try {
 			const { token, user } = await userController.login(null, {
-				username: 'shahanahmed86',
+				username: 'test-user',
 				password: '123abc4567',
 			});
 
@@ -40,7 +40,7 @@ describe('User login controller', function () {
 		try {
 			await userController
 				.login(null, {
-					username: 'shahanahmed86',
+					username: 'test-user',
 					password: 'wrong-password',
 				})
 				.catch((error) => {
@@ -50,7 +50,7 @@ describe('User login controller', function () {
 
 			await userController
 				.login(null, {
-					username: 'shahanahmed86',
+					username: 'test-user',
 				})
 				.catch((error) => {
 					const { errorMessage } = logics.catchError(error);
@@ -68,7 +68,7 @@ describe('User login controller', function () {
 
 			await userController
 				.login(null, {
-					username: 'shahanahmed86',
+					username: 'test-user',
 					password: '',
 				})
 				.catch((error) => {

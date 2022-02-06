@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { auth, executeCommand, logics } from '../../utils';
-import { adminController, middleware } from '../../controllers';
+import { auth, executeCommand, logics } from '../../../utils';
+import { adminController, middleware } from '../../../controllers';
 
 const { expect } = chai;
 

@@ -18,7 +18,6 @@ node setup postgresql
 # flags
 --yes # to skip question and go with default options
 --force-reinstall # to reinstall node_modules
---git # to initialize git subject to non initialized
 --dockerize # off-course
 
 # run the server
@@ -69,4 +68,12 @@ scan 0
 get "unique_identifier"
 ttl "unique_identifier"
 del "unique_identifier"
+```
+
+## git
+```sh
+git commit -m "message" --no-verify
+#flags
+--no-verify # it will not call pre-hook of commit where tests/linting will execute
+
 ```

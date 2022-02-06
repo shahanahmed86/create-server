@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { auth, logics } from '../../utils';
-import { userController, middleware } from '../../controllers';
+import { auth, logics } from '../../../utils';
+import { userController, middleware } from '../../../controllers';
 
 const { expect } = chai;
 
@@ -12,7 +12,7 @@ describe('User changePassword controller', function () {
 		let userId;
 		try {
 			const { token } = await userController.login(null, {
-				username: 'shahanahmed86',
+				username: 'test-user',
 				password: '123abc456',
 			});
 			expect(token).to.be.a('string');
@@ -41,7 +41,7 @@ describe('User changePassword controller', function () {
 		let userId;
 		try {
 			const { token } = await userController.login(null, {
-				username: 'shahanahmed86',
+				username: 'test-user',
 				password: '123abc4567',
 			});
 

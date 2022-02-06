@@ -4,6 +4,7 @@ const adminSchema = gql`
   type Admin {
     id: ID!
     username: String!
+    role: String!
     createdAt: Date!
     updatedAt: Date!
   }
