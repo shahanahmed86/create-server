@@ -152,7 +152,7 @@ let options = {
 			executeCommand('npm run db:deploy');
 
 			// initial commit
-			executeCommand('git add .; git commit -m "initial commit" --no-verify');
+			executeCommand('git add .; git commit -m "initial commit" --no-verify', undefined, 'ignore');
 
 			coloredLogs('Setup Finished', undefined, true);
 		});
