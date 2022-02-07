@@ -25,8 +25,10 @@ server.start().then(() => {
 	server.applyMiddleware({ app, path: '/graphql', cors: false });
 
 	httpServer.listen({ port: APP_PORT }, () => {
-		console.log(`🚀 REST-APIs    : ${BASE_URL}/api`);
-		console.log(`🚀 GRAPHQL-APIs : ${BASE_URL}${server.graphqlPath}`);
+		console.log(`\n🚀 REST-APIs Docs : ${BASE_URL}/api-docs\n`);
+
+		console.log(`🚀 REST-APIs      : ${BASE_URL}/api`);
+		console.log(`🚀 GRAPHQL-APIs   : ${BASE_URL}${server.graphqlPath}`);
 	});
 });
 

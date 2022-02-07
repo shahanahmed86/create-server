@@ -33,7 +33,7 @@ const options = {
 			},
 		],
 	},
-	apis: ['./src/express/routes/**/**/index.js'], // files containing annotations as above
+	apis: ['./src/express/routes/**/swagger.js'], // files containing annotations as above
 };
 
 const specs = swaggerJsDoc(options);
