@@ -4,12 +4,12 @@
 
 ```sh
 # dockerize the project
-create-server
+@shahanahmed86/create-server
 
 # supported databases (mysql, postgresql) can be provided as an argument, like:
-create-server mysql
+@shahanahmed86/create-server mysql
 # or
-create-server postgresql
+@shahanahmed86/create-server postgresql
 
 # flags
 --yes # to skip question and go with default options

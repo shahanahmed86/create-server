@@ -4,7 +4,7 @@
 
 ```sh
 # Clone (or fork) the repo
-git clone https://github.com/shahanahmed86/graphql-rest-server.git && cd graphql-rest-server
+git clone https://github.com/shahanahmed86/<repository_name>.git && cd <repository_name>
 
 # dockerize the project
 node setup
