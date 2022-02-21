@@ -1,0 +1,21 @@
+version: '3.1'
+
+services:
+  server:
+    build:
+      context: .
+      args:
+        - NODE_ENV=test
+    environment:
+      - NODE_ENV=test
+    restart: "no"
+    command: sh -c "sh db_deploy.sh && npm run exec-tests"
+
+  mysqldb:
+    volumes:
+      - mysql_test:/var/lib/mysql
+
+volumes:
+  mysql_test:
+    driver: local
+    

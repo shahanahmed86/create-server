@@ -1,3 +1,4 @@
+import os from 'os';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -60,7 +61,8 @@ app.set('view engine', 'ejs');
 app.use(fileUpload({ limits: { fileSize: 5 * 1024 * 1024 } }));
 
 // logs
-app.use(morgan('dev'));
+morgan.token('host', () => os.hostname);
+app.use(morgan(':host :method :url :response-time'));
 
 // x-powered-by
 app.disable('x-powered-by');

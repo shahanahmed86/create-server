@@ -2,31 +2,23 @@ import path from 'path';
 import arg from 'arg';
 import inquirer from 'inquirer';
 import { createProject } from './main';
-import {
-	copyFiles,
-	databaseValidator,
-	executeCommand,
-	projectValidator,
-	repositoryValidator
-} from './helper';
+import { executeCommand, projectValidator, repositoryValidator } from './helper';
 
-function parseArgumentsIntoOptions(rawArgs) {
-	const args = arg(
+function parseArgumentsIntoOptions(args) {
+	const rawArgs = arg(
 		{
+			'--yes': Boolean,
 			'--install': Boolean,
-			'--dockerize': Boolean,
 			'-y': '--yes',
-			'-i': '--install',
-			'-d': '--dockerize'
+			'-i': '--install'
 		},
 		{
-			argv: rawArgs.slice(2)
+			argv: args.slice(2)
 		}
 	);
 	return {
-		install: args['--install'] || false,
-		dockerize: args['--dockerize'] || false,
-		database: args._[0]
+		install: rawArgs['--install'] || false,
+		args: rawArgs._[0]
 	};
 }
 
@@ -43,15 +35,6 @@ async function promptForMissingOptions(options) {
 			message: "Please enter the Repository's URL: "
 		}
 	];
-	if (!options.database) {
-		questions.push({
-			type: 'list',
-			name: 'database',
-			message: 'Please choose which database to use',
-			choices: ['mysql', 'postgresql'],
-			default: 'mysql'
-		});
-	}
 
 	if (!options.install) {
 		questions.push({
@@ -62,21 +45,11 @@ async function promptForMissingOptions(options) {
 		});
 	}
 
-	if (!options.dockerize) {
-		questions.push({
-			type: 'confirm',
-			name: 'dockerize',
-			message: 'Do you wanna dockerize it?',
-			default: true
-		});
-	}
-
 	const answers = await inquirer.prompt(questions);
 
 	try {
 		projectValidator(options.project || answers.project);
 		repositoryValidator(options.repository || answers.repository);
-		databaseValidator(options.database || answers.database);
 	} catch (error) {
 		executeCommand(`echo "\n\\e[1;31m ...${error.message}... \\e[0m"`);
 
@@ -84,9 +57,7 @@ async function promptForMissingOptions(options) {
 	}
 	return {
 		...options,
-		database: options.database || answers.database,
 		install: options.install || answers.install,
-		dockerize: options.dockerize || answers.dockerize,
 		project: answers.project,
 		repository: answers.repository
 	};
@@ -100,7 +71,7 @@ export async function cli(args) {
 	const currentFileUrl = new URL(import.meta.url).pathname;
 	const templateDirectory = path.resolve(currentFileUrl, '../../template/source');
 
-	const { dockerize, install, database, repository, project } = options;
+	const { install, repository, project } = options;
 
 	const isTargetDirNotEmpty =
 		executeCommand(
@@ -131,21 +102,7 @@ export async function cli(args) {
 
 	executeCommand(cmd);
 
-	cmd = `cd ${targetDirectory}; node setup ${database} --yes`;
-
-	if (dockerize) {
-		cmd += ' --dockerize';
-
-		await copyFiles(
-			`${templateDirectory}/../docker-compose-${database}.yml`,
-			`${targetDirectory}/docker-compose.yml`
-		);
-
-		await copyFiles(
-			`${templateDirectory}/../docker-compose-${database}.test.yml`,
-			`${targetDirectory}/docker-compose.test.yml`
-		);
-	}
+	cmd = `cd ${targetDirectory}; node setup --yes`;
 
 	if (install) executeCommand(cmd);
 }

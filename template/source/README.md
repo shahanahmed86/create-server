@@ -9,16 +9,9 @@ git clone https://github.com/shahanahmed86/<repository_name>.git && cd <reposito
 # dockerize the project
 node setup
 
-# supported databases (mysql, postgresql) can be provided as an argument, like:
-node setup mysql
-# or
-node setup postgresql
-# if you've dockerize it and selected postgresql option then you have to change docker-compose.yml file accordingly.
-
 # flags
---yes # to skip question and go with default options
---force-reinstall # to reinstall node_modules
---dockerize # off-course
+--yes || -y # to skip question and go with default options
+--force-reinstall || -f # to reinstall node_modules
 
 # run the server
 npm run dev
@@ -31,34 +24,21 @@ npm run dev
 docker exec -it <container_name> bash
 
 # docker to open mysql
-docker exec -it <container_name> mysql -u root -p prisma
+docker exec -it <container_name> mysql -u<user> -p<password> -h<host> <name>
+
+# <name> is the database name
 
 # flags
 -it # for interactive
 -u # for username
--p # database
-```
-
-## postgresql
-
-```sh
-# docker to open bash
-docker exec -it <container_name> bash
-
-# docker to open psql
-docker exec -it <container_name> psql -U prisma -W dev
-
-# flags
--it # for interactive
--U # for username
--W # database
-# postgresql terminal commands list
+-p # for password
+-h # for host
 ```
 
 ## redis commands
 
 ```sh
-docker exec -it <container_name> redis-cli -a secret
+docker exec -it <container_name> redis-cli -a <password>
 # flags
 -it # for interactive
 redis-cli # to load redis command line interface

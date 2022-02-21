@@ -11,10 +11,8 @@ const rawArgs = arg(
 	{
 		'--yes': Boolean,
 		'--force-reinstall': Boolean,
-		'--dockerize': Boolean,
 		'-y': '--yes',
 		'-f': '--force-reinstall',
-		'-d': '--dockerize',
 	},
 	{
 		argv: process.argv.slice(2),
@@ -24,133 +22,45 @@ const rawArgs = arg(
 let options = {
 	forceReInstall: rawArgs['--force-reinstall'] || false,
 	skipPrompts: rawArgs['--yes'] || false,
-	dockerize: rawArgs['--dockerize'] || false,
-	database: rawArgs._[0],
+	args: rawArgs._[0],
 };
 
 (async () => {
 	try {
 		options = await promptForMissingOptions(options);
+		const { forceReInstall, skipPrompts, args, ...env } = options;
+		env.DB_PORT='3306' // mysql port
+		env.REDIS_PORT='6379' // redis port
 
-		if (!isFirst && options.forceReInstall) {
+		if (!isFirst && forceReInstall) {
 			fs.rmSync('node_modules', { recursive: true });
 			fs.rmSync('.husky/_', { recursive: true });
 		}
 
 		shouldInstallModules();
 
-		let port = 3306;
-		if (options.database === 'postgresql') port = 5432;
+		executeCommand('cp -i .env.example .env');
 
-		if (!fs.existsSync('.env')) executeCommand('cp .env.example .env');
+		const allVars = getJSON('.env', '=');
+		Object.keys(env).forEach((k) => {
+			if (!(k in allVars)) executeCommand(`echo "${k}=${env[k]}" >> .env`);
+		});
 
-		let env = getJSON('.env', '=');
-
-		if (!('REDIS_PASSWORD' in env)) {
-			executeCommand(`echo "REDIS_PASSWORD=secret\n" >> .env`);
-
-			env = getJSON('.env', '=');
-		}
-
-		if (!('DATABASE_URL' in env)) {
-			executeCommand(
-				`echo "DATABASE_URL=${options.database}://root:prisma@localhost:${port}/mydb" >> .env`,
-			);
-
-			env = getJSON('.env', '=');
-		}
-
-		const [db, config] = env.DATABASE_URL.split('://');
-
-		if (!options.database.includes(db)) {
-			coloredLogs('Please customize DATABASE_URL in ".env" according to the database', true);
-
-			process.exit(1);
-		}
+		executeCommand(
+			`echo "DATABASE_URL=mysql://root:${env.DB_PASS}@${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}" >> .env`,
+		);
 
 		new Promise((resolve) => {
-			if (options.dockerize) {
-				executeCommand(`docker-compose --version`);
+			if (!fs.existsSync('docker-compose.yml')) {
+				coloredLogs("You don't have an docker-compose.yml file in your project", true);
 
-				coloredLogs('Dockerize in process for the server....');
-
-				if (!fs.existsSync('docker-compose.yml')) {
-					coloredLogs("You don't have an docker-compose.yml file in your root", true);
-
-					process.exit(1);
-				}
-
-				executeCommand(`npm run up`);
-
-				switch (db) {
-					case 'mysql': {
-						if (!config.includes('3306')) {
-							coloredLogs(
-								'Please change port number to 3306 in DATABASE_URL ".env" like @localhost:3306',
-								true,
-							);
-
-							process.exit(1);
-						}
-
-						const container = executeCommand(
-							`docker ps --format '{{ .Names }}' | grep "${db}_db"`,
-							false,
-							'pipe',
-						);
-
-						const [user, password] = config.split('@')[0].split(':');
-
-						executeCommand(`
-								while ! docker exec ${container} mysql --user=${user} --password=${password} -e "SELECT 1" >/dev/null 2>&1;
-								do
-									printf "."
-									sleep 2
-								done
-								printf "done\n"
-							`);
-						break;
-					}
-					case 'postgresql': {
-						if (!config.includes('5432')) {
-							coloredLogs(
-								'Please change port number to 5432 in DATABASE_URL ".env" like @localhost:5432',
-								true,
-							);
-
-							process.exit(1);
-						}
-
-						break;
-					}
-					default: {
-						coloredLogs('Either use mysql or postgresql and set variables according to it', true);
-
-						process.exit(1);
-					}
-				}
+				process.exit(1);
 			}
+
+			executeCommand(`npm run up`);
 
 			resolve();
 		}).then(() => {
-			coloredLogs('running db migration to upsert tables....');
-
-			const tomlPath = 'prisma/migrations/migration_lock.toml';
-			if (fs.existsSync(tomlPath)) {
-				const toml = getJSON(tomlPath);
-
-				if (toml.provider.indexOf(db) === -1) {
-					fs.rmSync('prisma/migrations', { recursive: true });
-				}
-			}
-			const existingProvider = getJSON('prisma/schema.prisma').provider;
-
-			if (existingProvider && !existingProvider.includes(db)) {
-				executeCommand(`sed -i -e 's,= ${existingProvider},= "${db}",g' prisma/schema.prisma`);
-			}
-
-			executeCommand('npm run db:deploy');
-
 			// initial commit
 			executeCommand('git add .; git commit -m "initial commit" --no-verify', undefined, 'ignore');
 
@@ -184,39 +94,112 @@ function coloredLogs(message, failed = false, shouldExit = false) {
 }
 
 async function promptForMissingOptions(options) {
-	const defaultDatabase = 'mysql';
 	if (options.skipPrompts) {
 		return {
 			...options,
-			database: options.database || defaultDatabase,
+			BCRYPT_SALT: options.BCRYPT_SALT || '10',
+			JWT_SECRET: options.JWT_SECRET || 'jwt_secret',
+			SMTP_HOST: options.SMTP_HOST || 'smtp.gmail.com',
+			SMTP_PORT: options.SMTP_PORT || '465',
+			SMTP_USER: options.SMTP_USER || 'shahan.nodemailer',
+			SMTP_PASS: options.SMTP_PASS || '123Abc456%',
+			REDIS_HOST: options.REDIS_HOST || 'cache',
+			REDIS_PASSWORD: options.REDIS_PASSWORD || 'secret',
+			DB_HOST: options.DB_HOST || 'mysqldb',
+			DB_USER: options.DB_USER || 'prisma',
+			DB_PASS: options.DB_PASS || 'prisma',
+			DB_NAME: options.DB_NAME || 'mydb',
 		};
 	}
 
-	const questions = [];
-	if (!options.database) {
-		questions.push({
-			type: 'list',
-			name: 'database',
-			message: 'Please choose which database to use',
-			choices: ['mysql', 'postgresql'],
-			default: defaultDatabase,
-		});
-	}
-
-	if (!options.dockerize) {
-		questions.push({
-			type: 'confirm',
-			name: 'dockerize',
-			message: 'Do you wanna dockerize it?',
-			default: false,
-		});
-	}
+	const questions = [
+		{
+			type: 'input',
+			name: 'BCRYPT_SALT',
+			message: 'Please enter the salt value to encrypt password/values with',
+			default: '10',
+		},
+		{
+			type: 'password',
+			name: 'JWT_SECRET',
+			message: 'Please enter the secret to create a Login token with',
+			default: 'jwt_secret',
+		},
+		{
+			type: 'input',
+			name: 'SMTP_HOST',
+			message: 'Please enter the host for email address to send email with',
+			default: 'smtp.gmail.com',
+		},
+		{
+			type: 'input',
+			name: 'SMTP_PORT',
+			message: 'Please enter the port of the host for email address',
+			default: '465',
+		},
+		{
+			type: 'input',
+			name: 'SMTP_USER',
+			message: 'Please enter the email address to send email with',
+			default: 'shahan.nodemailer',
+		},
+		{
+			type: 'password',
+			name: 'SMTP_PASS',
+			message: 'Please enter the password of email address to send email with',
+			default: '123Abc456%',
+		},
+		{
+			type: 'input',
+			name: 'REDIS_HOST',
+			message: 'Please enter the host name where redis is serving',
+			default: 'cache',
+		},
+		{
+			type: 'password',
+			name: 'REDIS_PASSWORD',
+			message: "Please enter the password of Redis' host where it is serving",
+			default: 'secret',
+		},
+		{
+			type: 'input',
+			name: 'DB_HOST',
+			message: 'Please enter the host of database',
+			default: 'mysqldb',
+		},
+		{
+			type: 'input',
+			name: 'DB_USER',
+			message: "Please enter the username of Database's host",
+			default: 'prisma',
+		},
+		{
+			type: 'password',
+			name: 'DB_PASS',
+			message: "Please enter the password of Database's host",
+			default: 'prisma',
+		},
+		{
+			type: 'input',
+			name: 'DB_NAME',
+			message: "Please enter the name of Database's host like mydb, test or etc",
+			default: 'mydb',
+		},
+	];
 
 	const answers = await inquirer.prompt(questions);
 	return {
 		...options,
-		database: options.database || answers.database,
-		dockerize: options.dockerize || answers.dockerize,
+		BCRYPT_SALT: options.BCRYPT_SALT || answers.BCRYPT_SALT,
+		JWT_SECRET: options.JWT_SECRET || answers.JWT_SECRET,
+		SMTP_USER: options.SMTP_USER || answers.SMTP_USER,
+		SMTP_PASS: options.SMTP_PASS || answers.SMTP_PASS,
+		REDIS_HOST: options.REDIS_HOST || answers.REDIS_HOST,
+		REDIS_PASSWORD: options.REDIS_PASSWORD || answers.REDIS_PASSWORD,
+		DB_HOST: options.DB_HOST || answers.DB_HOST,
+		DB_USER: options.DB_USER || answers.DB_USER,
+		DB_PASS: options.DB_PASS || answers.DB_PASS,
+		DB_NAME: options.DB_NAME || answers.DB_NAME,
 	};
 }
 

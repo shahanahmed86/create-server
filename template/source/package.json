@@ -4,15 +4,13 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"postinstall": "echo 'installing husky....'; husky install",
+		"prepare": "echo 'installing husky....' && husky install",
 		"dev": "cross-env NODE_ENV=development nodemon -r esm .",
 		"start": "cross-env NODE_ENV=production node -r esm .",
-		"up:test": "docker-compose -f docker-compose.test.yml up -d",
-		"down:test": "docker-compose -f docker-compose.test.yml down -v",
-		"up": "docker-compose up -d",
-		"down": "docker-compose down",
-		"down:hard": "docker-compose down -v",
-		"deep-check": "depcheck --ignores esm,ejs,eslint-plugin-prettier",
+		"up": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+		"down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+		"down:hard": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v",
+		"deep-check": "npx depcheck --ignores esm,ejs,eslint-plugin-prettier",
 		"db:format": "prisma format",
 		"predb:deploy": "npm run db:format",
 		"db:deploy": "prisma migrate dev --name init",
@@ -21,15 +19,14 @@
 		"db:reset": "prisma migrate reset",
 		"lint": "eslint '**/*.js'",
 		"prettify": "prettier --no-editorconfig -l --write '**/*.{js,json}'",
-		"pretest": "npm run down",
-		"test": "node -r esm test-script.js",
-		"posttest": "npm run down:test"
+		"exec-tests": "mocha -r esm src/tests/**/*.spec.js --exit",
+		"test": "docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit",
+		"posttest": "docker-compose -f docker-compose.yml -f docker-compose.test.yml down -v"
 	},
 	"lint-staged": {
 		"**/*.{js,json}": [
 			"npm run lint",
-			"npm run prettify",
-			"npm run test"
+			"npm run prettify"
 		]
 	},
 	"prisma": {
@@ -60,25 +57,9 @@
 		"arg": "^5.0.1",
 		"bcryptjs": "^2.4.3",
 		"cors": "^2.8.5",
-		"ejs": "^3.1.6",
-		"express": "^4.17.1",
-		"express-fileupload": "^1.2.1",
-		"graphql": "^15.8.0",
-		"inquirer": "^8.2.0",
-		"ioredis": "^4.28.2",
-		"joi": "^17.5.0",
-		"jsonwebtoken": "^8.5.1",
-		"moment": "^2.29.1",
-		"morgan": "^1.10.0",
-		"swagger-jsdoc": "^6.1.0",
-		"swagger-ui-express": "^4.3.0"
-	},
-	"devDependencies": {
-		"chai": "^4.3.4",
-		"chai-http": "^4.3.0",
 		"cross-env": "^7.0.3",
-		"depcheck": "^1.4.2",
 		"dotenv": "^10.0.0",
+		"ejs": "^3.1.6",
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-config-standard": "^16.0.3",
@@ -87,11 +68,26 @@
 		"eslint-plugin-prettier": "^4.0.0",
 		"eslint-plugin-promise": "^5.2.0",
 		"esm": "^3.2.25",
+		"express": "^4.17.1",
+		"express-fileupload": "^1.2.1",
+		"graphql": "^15.8.0",
 		"husky": "^7.0.4",
+		"inquirer": "^8.2.0",
+		"ioredis": "^4.28.2",
+		"joi": "^17.5.0",
+		"jsonwebtoken": "^8.5.1",
 		"lint-staged": "^12.1.2",
-		"mocha": "^8.4.0",
-		"nodemon": "^2.0.15",
+		"moment": "^2.29.1",
+		"morgan": "^1.10.0",
 		"prettier": "^2.5.1",
-		"prisma": "^3.6.0"
+		"prisma": "^3.6.0",
+		"swagger-jsdoc": "^6.1.0",
+		"swagger-ui-express": "^4.3.0"
+	},
+	"devDependencies": {
+		"chai": "^4.3.4",
+		"chai-http": "^4.3.0",
+		"mocha": "^8.4.0",
+		"nodemon": "^2.0.15"
 	}
 }

@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { auth, executeCommand, logics } from '../../../utils';
+import { auth, logics } from '../../../utils';
 import { adminController, middleware } from '../../../controllers';
 
 const { expect } = chai;
@@ -7,10 +7,6 @@ const { expect } = chai;
 describe('Admin changePassword controller', function () {
 	this.timeout(0);
 	this.slow(1000);
-
-	before(async () => {
-		executeCommand('npm run db:seed', false, 'ignore');
-	});
 
 	it('admin changePassword => should success', async () => {
 		let adminId;
@@ -42,6 +38,7 @@ describe('Admin changePassword controller', function () {
 	});
 
 	it('admin changePassword => should fail', async () => {
+		let context;
 		try {
 			const { token } = await adminController.login(null, {
 				username: 'shahan',
@@ -49,7 +46,7 @@ describe('Admin changePassword controller', function () {
 			});
 
 			const user = await middleware.ensureSignIn({ shouldAdmin: true }, `Bearer ${token}`);
-			const context = { req: { user } };
+			context = { req: { user } };
 
 			await adminController
 				.changePassword(undefined, { oldPassword: '', password: 'shahan' }, context)
@@ -95,10 +92,13 @@ describe('Admin changePassword controller', function () {
 		} catch (error) {
 			console.error(error);
 			expect(true).to.be.false;
+		} finally {
+			await adminController
+				.changePassword(undefined, { oldPassword: '123abc456', password: 'shahan' }, context)
+				.catch((error) => {
+					console.error(error);
+					expect(true).to.be.false;
+				});
 		}
-	});
-
-	after(async () => {
-		executeCommand('npm run db:seed', false, 'ignore');
 	});
 });

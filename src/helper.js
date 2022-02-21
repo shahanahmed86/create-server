@@ -41,9 +41,3 @@ export function repositoryValidator(input) {
 		);
 	}
 }
-
-export function databaseValidator(input) {
-	if (!['mysql', 'postgresql'].some((db) => db === input)) {
-		throw new Error('Only mysql or postgresql are allowed');
-	}
-}

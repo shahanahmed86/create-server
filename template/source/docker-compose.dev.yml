@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  server:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: sh -c "sh db_deploy.sh && npm run dev"
+        
+  mysqldb:
+    volumes:
+      - mysql_dev:/var/lib/mysql
+
+volumes:
+  mysql_dev:
+    driver: local
