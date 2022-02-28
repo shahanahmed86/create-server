@@ -17,6 +17,7 @@
 		"postdb:deploy": "npm run db:seed",
 		"db:seed": "prisma db seed",
 		"db:reset": "prisma migrate reset",
+		"db:generate": "prisma generate",
 		"lint": "eslint '**/*.js'",
 		"prettify": "prettier --no-editorconfig -l --write '**/*.{js,json}'",
 		"exec-tests": "mocha -r esm src/tests/**/*.spec.js --exit",

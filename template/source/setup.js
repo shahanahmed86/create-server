@@ -29,8 +29,6 @@ let options = {
 	try {
 		options = await promptForMissingOptions(options);
 		const { forceReInstall, skipPrompts, args, ...env } = options;
-		env.DB_PORT='3306' // mysql port
-		env.REDIS_PORT='6379' // redis port
 
 		if (!isFirst && forceReInstall) {
 			fs.rmSync('node_modules', { recursive: true });
@@ -97,18 +95,20 @@ async function promptForMissingOptions(options) {
 	if (options.skipPrompts) {
 		return {
 			...options,
-			BCRYPT_SALT: options.BCRYPT_SALT || '10',
+			BCRYPT_SALT: options.BCRYPT_SALT || 10,
 			JWT_SECRET: options.JWT_SECRET || 'jwt_secret',
 			SMTP_HOST: options.SMTP_HOST || 'smtp.gmail.com',
-			SMTP_PORT: options.SMTP_PORT || '465',
+			SMTP_PORT: options.SMTP_PORT || 465,
 			SMTP_USER: options.SMTP_USER || 'shahan.nodemailer',
 			SMTP_PASS: options.SMTP_PASS || '123Abc456%',
 			REDIS_HOST: options.REDIS_HOST || 'cache',
 			REDIS_PASSWORD: options.REDIS_PASSWORD || 'secret',
+			REDIS_PORT: options.REDIS_PORT || 6379,
 			DB_HOST: options.DB_HOST || 'mysqldb',
 			DB_USER: options.DB_USER || 'prisma',
 			DB_PASS: options.DB_PASS || 'prisma',
 			DB_NAME: options.DB_NAME || 'mydb',
+			DB_PORT: options.DB_PORT || 3306,
 		};
 	}
 
@@ -156,6 +156,12 @@ async function promptForMissingOptions(options) {
 			default: 'cache',
 		},
 		{
+			type: 'input',
+			name: 'REDIS_PORT',
+			message: 'Please enter the port where redis is serving',
+			default: 6379,
+		},
+		{
 			type: 'password',
 			name: 'REDIS_PASSWORD',
 			message: "Please enter the password of Redis' host where it is serving",
@@ -185,6 +191,12 @@ async function promptForMissingOptions(options) {
 			message: "Please enter the name of Database's host like mydb, test or etc",
 			default: 'mydb',
 		},
+		{
+			type: 'input',
+			name: 'DB_PORT',
+			message: "Please enter the port where Database's host",
+			default: 3306,
+		},
 	];
 
 	const answers = await inquirer.prompt(questions);
@@ -196,10 +208,12 @@ async function promptForMissingOptions(options) {
 		SMTP_PASS: options.SMTP_PASS || answers.SMTP_PASS,
 		REDIS_HOST: options.REDIS_HOST || answers.REDIS_HOST,
 		REDIS_PASSWORD: options.REDIS_PASSWORD || answers.REDIS_PASSWORD,
+		REDIS_PORT: options.REDIS_PORT || answers.REDIS_PORT,
 		DB_HOST: options.DB_HOST || answers.DB_HOST,
 		DB_USER: options.DB_USER || answers.DB_USER,
 		DB_PASS: options.DB_PASS || answers.DB_PASS,
 		DB_NAME: options.DB_NAME || answers.DB_NAME,
+		DB_PORT: options.DB_PORT || answers.DB_PORT,
 	};
 }
 
