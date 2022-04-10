@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 
 services:
   server:
@@ -6,14 +6,28 @@ services:
       context: .
       args:
         - NODE_ENV=development
+    env_file:
+      - .env
+    restart: on-failure
+    links:
+      - mysqldb
+      - cache
     volumes:
-      - ./:/app
       - /app/node_modules
-    command: sh -c "sh db_deploy.sh && npm run dev"
+      - ./:/app
+    command: npm run dev
         
   mysqldb:
+    restart: on-failure
+    env_file:
+      - .env
     volumes:
       - mysql_dev:/var/lib/mysql
+
+  cache:
+    restart: on-failure
+    env_file:
+      - .env
 
 volumes:
   mysql_dev:

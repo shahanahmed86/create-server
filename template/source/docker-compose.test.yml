@@ -1,21 +1,30 @@
-version: '3.1'
+version: '3.7'
 
 services:
   server:
-    build:
-      context: .
-      args:
-        - NODE_ENV=test
+    build: .
+    restart: on-failure
+    links:
+      - mysqldb
+      - cache
+    env_file:
+      - .env
     environment:
       - NODE_ENV=test
-    restart: "no"
-    command: sh -c "sh db_deploy.sh && npm run exec-tests"
+    command: npm run exec-tests
 
   mysqldb:
+    restart: on-failure
+    env_file:
+      - .env
     volumes:
       - mysql_test:/var/lib/mysql
+
+  cache:
+    restart: on-failure
+    env_file:
+      - .env
 
 volumes:
   mysql_test:
     driver: local
-    

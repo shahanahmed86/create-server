@@ -108,3 +108,6 @@ _builds
 
 # uploads
 uploads
+
+# docker secrets
+/secrets
