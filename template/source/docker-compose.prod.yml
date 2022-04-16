@@ -18,11 +18,14 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    volumes:
+      - ./expose_env.sh:/app/expose_env.sh
     command:
-      - bash
+      - sh
       - -c
       - |
-        export NODE_ENV="$(cat $NODE_ENV_FILE)"
+        ./expose_env.sh
+        ./db_deploy.sh
         npm run start
     secrets:
       - NODE_ENV
@@ -76,17 +79,22 @@ services:
       - MYSQL_USER_FILE=/run/secrets/DB_USER
       - MYSQL_PASSWORD_FILE=/run/secrets/DB_PASS
     volumes:
+      - ./expose_env.sh:/expose_env.sh
       - mysql_prod:/var/lib/mysql
-
 
   cache:
     secrets:
       - REDIS_PASSWORD
     environment:
       - REDIS_PASSWORD_FILE=/run/secrets/REDIS_PASSWORD
+    volumes:
+      - ./expose_env.sh:/expose_env.sh
+      - cache_prod:/data
     
 volumes:
   mysql_prod:
+    driver: local
+  cache_prod:
     driver: local
 
 secrets:

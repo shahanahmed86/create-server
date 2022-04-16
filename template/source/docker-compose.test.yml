@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   server:
+    tty: true
     build: .
     restart: on-failure
     links:
@@ -9,11 +10,15 @@ services:
       - cache
     env_file:
       - .env
-    environment:
-      - NODE_ENV=test
-    command: npm run exec-tests
+    command:
+      - sh
+      - -c
+      - |
+        ./db_deploy.sh
+        npm run exec-tests
 
   mysqldb:
+    tty: true
     restart: on-failure
     env_file:
       - .env
@@ -21,10 +26,15 @@ services:
       - mysql_test:/var/lib/mysql
 
   cache:
+    tty: true
     restart: on-failure
     env_file:
       - .env
+    volumes:
+      - cache_test:/data
 
 volumes:
   mysql_test:
+    driver: local
+  cache_test:
     driver: local

@@ -6,3 +6,4 @@ Dockerfile
 docker-compose*
 .env*
 secrets
+expose_env.sh

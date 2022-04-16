@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   server:
+    tty: true
     build:
       context: .
       args:
@@ -13,11 +14,17 @@ services:
       - mysqldb
       - cache
     volumes:
-      - /app/node_modules
       - ./:/app
-    command: npm run dev
+      - /app/node_modules
+    command:
+      - sh
+      - -c
+      - |
+        ./db_deploy.sh
+        npm run dev
         
   mysqldb:
+    tty: true
     restart: on-failure
     env_file:
       - .env
@@ -25,10 +32,15 @@ services:
       - mysql_dev:/var/lib/mysql
 
   cache:
+    tty: true
     restart: on-failure
     env_file:
       - .env
+    volumes:
+      - cache_dev:/data
 
 volumes:
   mysql_dev:
+    driver: local
+  cache_dev:
     driver: local
