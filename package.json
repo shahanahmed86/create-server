@@ -11,7 +11,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+    "upgrade:version": "npm version patch -m 'Upgrade to %s'"
 	},
 	"repository": {
 		"type": "git",
