@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 ENV_VARS=$(printenv | grep _FILE)
 LENGTH=$(printenv | grep _FILE | wc -l)
 
@@ -20,8 +22,6 @@ if [ $LENGTH -gt 0 ]; then
     # getting the content of the path which has the secret
     VAL=$(cat $VAL)
 
-    $KEY=$VAL
-
-    echo export $KEY
+    export $KEY=$VAL
   done
 fi
