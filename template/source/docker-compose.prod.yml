@@ -3,30 +3,7 @@ version: '3.7'
 services:
   server:
     image: <your_username>/image:tag
-    deploy:
-      replicas: 4
-      update_config:
-        parallelism: 2
-        order: start-first
-        failure_action: rollback
-        delay: 10s
-      rollback_config:
-        parallelism: 0
-        order: stop-first
-      restart_policy:
-        condition: any
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-    volumes:
-      - ./expose_env.sh:/app/expose_env.sh
-    command:
-      - sh
-      - -c
-      - |
-        ./expose_env.sh
-        ./db_deploy.sh
-        npm run start
+    command: ["sh", "-c", "./db_deploy.sh && npm run start"]
     secrets:
       - NODE_ENV
       - APP_PORT
@@ -67,6 +44,21 @@ services:
       - DB_NAME_FILE=/run/secrets/DB_NAME
       - DB_PORT_FILE=/run/secrets/DB_PORT
       - DATABASE_URL_FILE=/run/secrets/DATABASE_URL
+    deploy:
+      replicas: 5
+      update_config:
+        parallelism: 2
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   mysqldb:
     secrets:
@@ -79,7 +71,6 @@ services:
       - MYSQL_USER_FILE=/run/secrets/DB_USER
       - MYSQL_PASSWORD_FILE=/run/secrets/DB_PASS
     volumes:
-      - ./expose_env.sh:/expose_env.sh
       - mysql_prod:/var/lib/mysql
 
   cache:
@@ -88,7 +79,6 @@ services:
     environment:
       - REDIS_PASSWORD_FILE=/run/secrets/REDIS_PASSWORD
     volumes:
-      - ./expose_env.sh:/expose_env.sh
       - cache_prod:/data
     
 volumes:

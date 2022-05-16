@@ -4,7 +4,7 @@
 
 ```sh
 # Clone (or fork) the repo
-git clone https://github.com/shahanahmed86/<repository_name>.git && cd <repository_name>
+git clone https://github.com/<username>/<repository_name>.git && cd <repository_name>
 
 # dockerize the project
 node setup
@@ -53,7 +53,7 @@ del "unique_identifier"
 ## git
 ```sh
 git commit -m "message" --no-verify
-#flags
+# flags
 --no-verify # it will not call pre-hook of commit where tests/linting will execute
 
 ```

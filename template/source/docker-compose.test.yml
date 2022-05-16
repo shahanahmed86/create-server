@@ -3,19 +3,17 @@ version: '3.7'
 services:
   server:
     tty: true
-    build: .
+    build:
+      context: .
+      args:
+        - NODE_ENV=test
     restart: on-failure
     links:
       - mysqldb
       - cache
     env_file:
       - .env
-    command:
-      - sh
-      - -c
-      - |
-        ./db_deploy.sh
-        npm run exec-tests
+    command: ["sh", "-c", "./db_deploy.sh && npm run exec-tests"]
 
   mysqldb:
     tty: true

@@ -16,10 +16,10 @@ RUN if [ "$NODE_ENV" = "production" ]; \
 COPY . .
 
 RUN chown -R node:node /app
-RUN chown -R node:node /app/node_modules
 USER node
 
-ENV PORT 4000
-EXPOSE $PORT
+EXPOSE 4000
 
-CMD [ "npm", "run", "start" ]
+ENTRYPOINT [ "docker-entrypoint.sh" ]
+
+CMD [ "node", "index.js" ]

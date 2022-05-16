@@ -16,13 +16,9 @@ services:
       MYSQL_DATABASE: $DB_NAME
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASS
-    ports:
-      - $DB_PORT:3306
     cap_add:
       - SYS_NICE # CAP_SYS_NICE
 
   cache:
-    image: redis:alpine
-    ports:
-      - $REDIS_PORT:6379
+    image: redis:7.0.0-alpine
     command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]

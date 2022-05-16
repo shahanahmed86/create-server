@@ -16,13 +16,9 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-    command:
-      - sh
-      - -c
-      - |
-        ./db_deploy.sh
-        npm run dev
-        
+      - /app/prisma/migrations
+    command: ["sh", "-c", "./db_deploy.sh && npm run dev"]
+
   mysqldb:
     tty: true
     restart: on-failure
