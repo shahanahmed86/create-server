@@ -20,7 +20,7 @@ export function executeCommand(cmd, exit = false, stdio = 'inherit') {
 	}
 }
 
-export async function copyFiles(template, target) {
+export function copyFiles(template, target) {
 	return copy(template, target, { clobber: false });
 }
 

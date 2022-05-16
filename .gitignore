@@ -114,3 +114,4 @@ migrations
 
 # exclude template
 template/source/.husky/_
+template/source/secrets
