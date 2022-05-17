@@ -96,23 +96,23 @@ export async function cli(args) {
 
 	// changing name of gitignore file by prefix "."
 	let cmd = `cd ${targetDirectory}; mv gitignore .gitignore;`;
-	cmd += `mv .husky/gitignore .husky/.gitignore;`;
+	cmd += `mv .husky/gitignore .husky/.gitignore`;
 
 	// applying provided project name to package.json
 	const currentProject = 'project_name';
-	cmd += `sed -i -e 's,${currentProject},${project},g' package.json;`;
+	cmd += `&& sed -i -e 's,${currentProject},${project},g' package.json`;
 
 	// applying provided repository name to package.json
 	const currentRepo = 'repository_name';
-	cmd += `sed -i -e 's,${currentRepo},${repository},g' package.json`;
+	cmd += `&& sed -i -e 's,${currentRepo},${repository},g' package.json`;
 
 	// applying provided image name
 	const currentImage = '<your_username>/image:tag';
-	cmd += `sed -i -e 's,${currentImage},${imageName},g' docker-compose.prod.yml`;
+	cmd += `&& sed -i -e 's,${currentImage},${imageName},g' docker-compose.prod.yml`;
 
 	executeCommand(cmd);
 
-	cmd = `cd ${targetDirectory}; node setup --yes`;
+	cmd = `&& cd ${targetDirectory}; node setup --yes`;
 
 	if (install) executeCommand(cmd);
 }
