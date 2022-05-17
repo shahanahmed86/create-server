@@ -33,6 +33,11 @@ async function promptForMissingOptions(options) {
 			type: 'input',
 			name: 'repository',
 			message: "Please enter the Repository's URL: "
+		},
+		{
+			type: 'input',
+			name: 'imageName',
+			message: "Please enter the Docker Image's name: "
 		}
 	];
 
@@ -48,6 +53,7 @@ async function promptForMissingOptions(options) {
 	const answers = await inquirer.prompt(questions);
 
 	try {
+		projectValidator(options.imageName || answers.imageName);
 		projectValidator(options.project || answers.project);
 		repositoryValidator(options.repository || answers.repository);
 	} catch (error) {
@@ -71,7 +77,7 @@ export async function cli(args) {
 	const currentFileUrl = new URL(import.meta.url).pathname;
 	const templateDirectory = path.resolve(currentFileUrl, '../../template/source');
 
-	const { install, repository, project } = options;
+	const { install, repository, project, imageName } = options;
 
 	const isTargetDirNotEmpty =
 		executeCommand(
@@ -99,6 +105,10 @@ export async function cli(args) {
 	// applying provided repository name to package.json
 	const currentRepo = 'repository_name';
 	cmd += `sed -i -e 's,${currentRepo},${repository},g' package.json`;
+
+	// applying provided image name
+	const currentImage = '<your_username>/image:tag';
+	cmd += `sed -i -e 's,${currentImage},${imageName},g' docker-compose.prod.yml`;
 
 	executeCommand(cmd);
 

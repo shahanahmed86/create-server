@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 ENV_VARS=$(printenv | grep _FILE)
 LENGTH=$(printenv | grep _FILE | wc -l)
 
