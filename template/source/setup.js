@@ -55,7 +55,7 @@ let options = {
 				process.exit(1);
 			}
 
-			executeCommand(`npm run up`);
+			executeCommand(`make run-dev-up`);
 
 			resolve();
 		}).then(() => {
