@@ -112,7 +112,7 @@ export async function cli(args) {
 
 	executeCommand(cmd);
 
-	cmd = `&& cd ${targetDirectory}; node setup --yes`;
+	cmd = `&& cd ${targetDirectory} && node setup --yes`;
 
 	if (install) executeCommand(cmd);
 }
