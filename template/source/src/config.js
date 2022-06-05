@@ -7,7 +7,8 @@ export const {
 	APP_HOST = 'localhost:4000',
 
 	REDIS_HOST = 'localhost',
-	REDIS_PASSWORD = 'secret',
+	REDIS_USERNAME = 'redis_username',
+	REDIS_PASSWORD = 'redis_secret',
 
 	JWT_SECRET = 'jwt_secret',
 

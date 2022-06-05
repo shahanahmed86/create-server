@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while ! mysql --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" -e "SELECT 1" >/dev/null 2>&1; do
   printf "."

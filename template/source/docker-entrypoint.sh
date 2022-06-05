@@ -1,25 +1,47 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
-ENV_VARS=$(printenv | grep _FILE)
-LENGTH=$(printenv | grep _FILE | wc -l)
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		exit 1
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(<"${!fileVar}")"
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
 
-if [ $LENGTH -gt 0 ]; then
-  for ENV_VAR in $ENV_VARS; do
-    # getting key by excluding _FILE letters from it
-    KEY=$(echo $ENV_VAR | cut -d'=' -f1 | cut -d'FILE=' -f1)
+file_env 'NODE_ENV'
+file_env 'APP_PORT'
+file_env 'APP_PROTOCOL'
+file_env 'APP_HOST'
+file_env 'BCRYPT_SALT'
+file_env 'JWT_SECRET'
+file_env 'SMTP_HOST'
+file_env 'SMTP_PORT'
+file_env 'SMTP_USER'
+file_env 'SMTP_PASS'
+file_env 'REDIS_HOST'
+file_env 'REDIS_USERNAME'
+file_env 'REDIS_PASSWORD'
+file_env 'REDIS_PORT'
+file_env 'DB_HOST'
+file_env 'DB_USER'
+file_env 'DB_PASS'
+file_env 'DB_NAME'
+file_env 'DB_PORT'
+file_env 'DATABASE_URL'
 
-    # getting length of the key
-    LEN=${#KEY}
-
-    # reassigning the key
-    KEY=${KEY:0:LEN-1}
-
-    # getting the value of the env variable but it will the path to secret file
-    VAL=$(echo $ENV_VAR | cut -d'=' -f2)
-
-    # getting the content of the path which has the secret
-    VAL=$(cat $VAL)
-
-    export $KEY=$VAL
-  done
-fi
+exec "$@"

@@ -3,7 +3,7 @@ version: '3.7'
 services:
   server:
     ports:
-      - $APP_PORT:4000
+      - 4000:4000
     depends_on:
       - mysqldb
       - cache
@@ -21,4 +21,9 @@ services:
 
   cache:
     image: redis:7.0.0-alpine
-    command: ["sh", "-c", "redis-server --requirepass \"$REDIS_PASSWORD\""]
+    command:
+      [
+        "sh",
+        "-c",
+        "redis-server --requirepass \"$REDIS_PASSWORD\""
+      ]

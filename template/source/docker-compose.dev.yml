@@ -10,14 +10,11 @@ services:
     env_file:
       - .env
     restart: on-failure
-    links:
-      - mysqldb
-      - cache
     volumes:
       - ./:/app
       - /app/node_modules
       - /app/prisma/migrations
-    command: ["sh", "-c", "./db_deploy.sh && npm run dev"]
+    command: [ "bash", "-c", "./db_deploy.sh && npm run dev" ]
 
   mysqldb:
     tty: true

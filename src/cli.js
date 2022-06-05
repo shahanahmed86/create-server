@@ -53,9 +53,9 @@ async function promptForMissingOptions(options) {
 	const answers = await inquirer.prompt(questions);
 
 	try {
-		projectValidator(options.imageName || answers.imageName);
 		projectValidator(options.project || answers.project);
 		repositoryValidator(options.repository || answers.repository);
+		projectValidator(options.imageName || answers.imageName);
 	} catch (error) {
 		executeCommand(`echo "\n\\e[1;31m ...${error.message}... \\e[0m"`);
 
@@ -65,7 +65,8 @@ async function promptForMissingOptions(options) {
 		...options,
 		install: options.install || answers.install,
 		project: answers.project,
-		repository: answers.repository
+		repository: answers.repository,
+		imageName: answers.imageName
 	};
 }
 
@@ -80,11 +81,7 @@ export async function cli(args) {
 	const { install, repository, project, imageName } = options;
 
 	const isTargetDirNotEmpty =
-		executeCommand(
-			`[ "$(ls -A ${targetDirectory})" ] && echo true || echo false`,
-			false,
-			'pipe'
-		) === 'true';
+		executeCommand(`[ "$(ls -A ${targetDirectory})" ] && echo true || echo false`, false, 'pipe') === 'true';
 
 	if (isTargetDirNotEmpty) {
 		executeCommand(`echo "\n\\e[1;31m ...target folder is not empty... \\e[0m"`);
