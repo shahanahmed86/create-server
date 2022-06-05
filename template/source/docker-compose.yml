@@ -21,9 +21,3 @@ services:
 
   cache:
     image: redis:7.0.0-alpine
-    command:
-      [
-        "sh",
-        "-c",
-        "redis-server --requirepass \"$REDIS_PASSWORD\""
-      ]
