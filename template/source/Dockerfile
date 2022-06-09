@@ -25,7 +25,4 @@ EXPOSE 4000
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# check every 30s to ensure this service returns HTTP 200
-HEALTHCHECK --interval=30s --start-period=5m --retries=3 CMD node healthcheck.js
-
 CMD [ "node", "index.js" ]

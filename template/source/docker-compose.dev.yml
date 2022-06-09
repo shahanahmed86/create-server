@@ -13,7 +13,6 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-      - /app/prisma/migrations
     command: [ "bash", "-c", "./db_deploy.sh && npm run dev" ]
 
   mysqldb:
@@ -37,3 +36,7 @@ volumes:
     driver: local
   cache_dev:
     driver: local
+
+networks:
+  my_project:
+    driver: bridge

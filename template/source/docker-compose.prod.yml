@@ -1,6 +1,11 @@
 version: '3.7'
 
 services:
+  web:
+    networks:
+      - my_project
+    deploy:
+        mode: global
   server:
     image: 127.0.0.1:5000/my_project:1.0.0
     command: [ "bash", "-c", "./db_deploy.sh && npm run start" ]
@@ -33,3 +38,8 @@ volumes:
     driver: local
   cache_prod:
     driver: local
+
+networks:
+  my_project:
+
+    driver: overlay

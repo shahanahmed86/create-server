@@ -4,9 +4,9 @@ export const {
 	NODE_ENV = 'development',
 
 	APP_PROTOCOL = 'http:',
-	APP_HOST = 'localhost:4000',
+	APP_HOST = 'localhost',
 
-	REDIS_HOST = 'localhost',
+	REDIS_HOST = 'cache',
 
 	JWT_SECRET = 'jwt_secret',
 

@@ -8,43 +8,46 @@ import fileUpload from 'express-fileupload';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import { name } from '../../package.json';
-
-// swagger options
-const options = {
-	definition: {
-		openapi: '3.0.0',
-		info: {
-			version: '1.0.0',
-			title: name,
-			description: 'APIs documentation',
-		},
-		basePath: '/',
-		components: {
-			securitySchemes: {
-				bearerAuth: {
-					type: 'http',
-					scheme: 'bearer',
-					bearerFormat: 'JWT',
-				},
-			},
-		},
-		security: [
-			{
-				bearerAuth: [],
-			},
-		],
-	},
-	apis: ['./src/express/routes/**/swagger.js'], // files containing annotations as above
-};
-
-const specs = swaggerJsDoc(options);
+import { IN_PROD } from '../config';
 
 // initiate express app;
 const app = express();
 
-// swagger setup
-app.use('/api-docs', swaggerUI.serve);
-app.get('/api-docs', swaggerUI.setup(specs));
+if (!IN_PROD) {
+	// swagger options
+	const options = {
+		definition: {
+			openapi: '3.0.0',
+			info: {
+				version: '1.0.0',
+				title: name,
+				description: 'APIs documentation',
+			},
+			basePath: '/',
+			components: {
+				securitySchemes: {
+					bearerAuth: {
+						type: 'http',
+						scheme: 'bearer',
+						bearerFormat: 'JWT',
+					},
+				},
+			},
+			security: [
+				{
+					bearerAuth: [],
+				},
+			],
+		},
+		apis: ['./src/express/routes/**/swagger.js'], // files containing annotations as above
+	};
+
+	// swagger setup
+	const specs = swaggerJsDoc(options);
+
+	app.use('/api-docs', swaggerUI.serve);
+	app.get('/api-docs', swaggerUI.setup(specs));
+}
 
 // parser
 app.use(express.urlencoded({ extended: true }));
@@ -74,11 +77,11 @@ fs.readdirSync('./src/express/routes/').forEach((file) => {
 	}
 });
 
-app.get('/healthcheck', function (req, res) {
+app.get('/api/healthcheck', function (req, res) {
 	// do app logic here to determine if app is truly healthy
 	// you should return 200 if healthy, and anything else will fail
 	// if you want, you should be able to restrict this to localhost (include ipv4 and ipv6)
-	res.status(200).send('I am happy and healthy\n');
+	res.status(200).send(`I am happy and healthy, from host ${os.hostname}!\n`);
 });
 
 export default app;
