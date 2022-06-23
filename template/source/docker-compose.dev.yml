@@ -1,12 +1,21 @@
 version: '3.7'
 
 services:
+  web:
+    depends_on:
+      server:
+        condition: service_healthy
+
   server:
     tty: true
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+      cache:
+        condition: service_started
     build:
       context: .
-      args:
-        - NODE_ENV=development
+      target: dev
     env_file:
       - .env
     restart: on-failure
@@ -22,12 +31,16 @@ services:
       - .env
     volumes:
       - mysql_dev:/var/lib/mysql
+    ports:
+      - '$DB_PORT:3306'
 
   cache:
     tty: true
     restart: on-failure
     env_file:
       - .env
+    ports:
+      - '$REDIS_PORT:6379'
     volumes:
       - cache_dev:/data
 

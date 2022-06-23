@@ -1,12 +1,21 @@
 version: '3.7'
 
 services:
+  web:
+    depends_on:
+      server:
+        condition: service_healthy
+
   server:
     tty: true
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+      cache:
+        condition: service_started
     build:
       context: .
-      args:
-        - NODE_ENV=test
+      target: test
     restart: on-failure
     env_file:
       - .env
@@ -33,3 +42,7 @@ volumes:
     driver: local
   cache_test:
     driver: local
+
+networks:
+  my_project:
+    driver: bridge
