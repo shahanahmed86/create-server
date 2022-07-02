@@ -7,7 +7,7 @@ services:
     deploy:
       mode: global
   server:
-    image: 127.0.0.1:5000/my_project:1.0.0
+    image: <your_username>/image:tag
     command: [ "bash", "-c", "./db_deploy.sh && npm run start" ]
     deploy:
       replicas: 3

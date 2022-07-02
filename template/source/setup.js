@@ -60,7 +60,7 @@ let options = {
 			resolve();
 		}).then(() => {
 			// initial commit
-			executeCommand('git add .; git commit -m "initial commit" --no-verify', undefined, 'ignore');
+			executeCommand('git add . && git commit -m "initial commit" --no-verify', undefined, 'ignore');
 
 			coloredLogs('Setup Finished', undefined, true);
 		});
